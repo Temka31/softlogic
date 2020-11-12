@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from "react";
+import React from "react"
 import { Stage, Layer, Rect, Circle, Image } from 'react-konva';
 import useImage from 'use-image';
 
@@ -77,15 +78,30 @@ const time=(unix)=>{
 
 
 
-    const Image = (img) => {
+
+    const URLImage = ({img}) => {
+        console.log(img)
         const [image] = useImage(img);
         return <Image image={image} />;
     };
 
+
 const renderImg=(image, items)=>{
         return(
-            <Stage width={100} height={100}>
-                <Image image={"https://images.ua.prom.st/1440764527_saharnaya-kartinka-lyubov.jpg"} x={0} y={0}/>
+            <Stage width={200} height={200}>
+                <Layer>
+                <URLImage img={image} />
+                    {items.map(item=>{
+                        return <Rect
+                            x={item.x}
+                            y={item.y}
+                            width={item.w}
+                            height={item.h}
+                            stroke="black"
+                            onclick={()=>alert(2)}
+                        />
+                    })}
+                </Layer>
             </Stage>
         )
 
@@ -105,6 +121,7 @@ const renderImg=(image, items)=>{
                 {/*    console.log(e.region)*/}
                 {/*}}/>*/}
                 {renderImg(event.image,event.items)}
+
             </td>
             {/*<td style={styles.root}>{item.phone}</td>*/}
 

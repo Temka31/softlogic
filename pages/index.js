@@ -14,7 +14,7 @@ function Home() {
        "id": 1,
        "timestamp": 1605103000,
        "camera_id": "SOMECAMERAID",
-       "image": "https://example.com/image.jpg",
+       "image": "https://konvajs.org/assets/lion.png",
        "latitude": 55.723373333333335,
        "longitude": 37.626803333333335,
        "items": [
@@ -39,7 +39,7 @@ function Home() {
        "id": 2,
        "timestamp": 1605103000,
        "camera_id": "SOMECAMERAID",
-       "image": "https://example.com/image.jpg",
+       "image": "https://konvajs.org/assets/lion.png",
        "latitude": 55.723373333333335,
        "longitude": 37.626803333333335,
        "items": [
