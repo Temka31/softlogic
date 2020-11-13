@@ -4,10 +4,12 @@ import Table from "../components/table";
 import {loadGetInitialProps} from "next/dist/next-server/lib/utils";
 import {useState} from "react";
 import React from "react"
+import MapY from "../components/MapY";
 
 
 function Home() {
     const[loading, setLoading]=useState(true)
+
  let data={
    "events": [
      {
@@ -64,13 +66,23 @@ function Home() {
  }
 
 
+  const time = (unix) => {
+    let date = new Date(unix * 1000);
+    let d = date.getDate()
+    let m = date.getMonth()
+    let y = date.getFullYear()
+    let h = date.getHours()
+    let min = date.getMinutes()
+    let sec = date.getSeconds()
+    return `${d}-${m}-${y} ${h}:${min}:${sec}`
+  }
 
 
 
   return (
     <div className={styles.container}>
-      <Table events={data.events}/>
-
+      <Table events={data.events} time={time}/>
+      <MapY/>
     </div>
   )
 }

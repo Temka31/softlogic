@@ -8,7 +8,7 @@ const styles = {
         cursor: "pointer",
     }
 };
-export default function Table({ events}) {
+export default function Table({ events,time}) {
 
     return (
         <>
@@ -17,7 +17,7 @@ export default function Table({ events}) {
                 <tbody>
                 {console.log({events})}
                 {events.map(event => (
-                    <Row key={event.id} event={event}/>
+                    <Row key={event.id} event={event} time={time}/>
                 ))}
 
                 </tbody>
