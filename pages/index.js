@@ -5,10 +5,12 @@ import {loadGetInitialProps} from "next/dist/next-server/lib/utils";
 import {useState} from "react";
 import React from "react"
 import MapY from "../components/MapY";
+// import Tabl from "../components/tabl";
 
 
 function Home() {
     const[loading, setLoading]=useState(true)
+    const[table, setTable]=useState(true)
 
  let data={
    "events": [
@@ -81,8 +83,11 @@ function Home() {
 
   return (
     <div className={styles.container}>
-      <Table events={data.events} time={time}/>
-      <MapY/>
+      <button onClick={()=>setTable(!table)}>
+        {table?"Карта":"Таблица"}
+      </button>
+          {table?<Table events={data.events} time={time}/>:<MapY events={data.events} tome={time}/>}
+          {/*<Tabl/>*/}
     </div>
   )
 }
