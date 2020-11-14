@@ -38,7 +38,7 @@ export default function Row({event,time}) {
 
 
     const URLImage = ({img}) => {
-        console.log(img)
+        // console.log(img)
         const [image] = useImage(img);
         return <Image image={image}/>;
     };
@@ -51,6 +51,7 @@ export default function Row({event,time}) {
                     <URLImage img={image}/>
                     {items.map(item => {
                         return <Rect
+                            key={item.x}
                             x={item.x}
                             y={item.y}
                             width={item.w}
@@ -69,7 +70,7 @@ export default function Row({event,time}) {
         <tr id={event.id}
             // onClick={handleClick}
         >
-            {console.log(event)}
+            {/*{console.log(event)}*/}
             <td style={styles.root}>{event.id}</td>
             <td style={styles.root}>{event.camera_id}</td>
             <td style={styles.root}>{time(event.timestamp)}</td>

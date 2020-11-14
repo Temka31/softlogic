@@ -1,23 +1,21 @@
-import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import Table from "../components/table";
-import {loadGetInitialProps} from "next/dist/next-server/lib/utils";
 import {useState} from "react";
 import React from "react"
 import MapY from "../components/MapY";
-// import Tabl from "../components/tabl";
 
 
 function Home() {
     const[loading, setLoading]=useState(true)
     const[table, setTable]=useState(true)
 
- let data={
-   "events": [
+
+ const [data,setData] =useState(
+   [
      {
        "id": 1,
        "timestamp": 1605103000,
-       "camera_id": "SOMECAMERAID",
+       "camera_id": "1",
        "image": "https://konvajs.org/assets/lion.png",
        "latitude": 55.723373333333335,
        "longitude": 37.626803333333335,
@@ -42,7 +40,7 @@ function Home() {
      },{
        "id": 2,
        "timestamp": 1605103000,
-       "camera_id": "SOMECAMERAID",
+       "camera_id": "1",
        "image": "https://konvajs.org/assets/lion.png",
        "latitude": 55.723373333333335,
        "longitude": 37.626803333333335,
@@ -65,7 +63,7 @@ function Home() {
            "h": 80
          }, ]
      } ]
- }
+ )
 
 
   const time = (unix) => {
@@ -81,13 +79,23 @@ function Home() {
 
 
 
+const filterText =(id)=>{
+let columns =["id","camera_id"]
+     let newData = columns.filter((column)=>data.filter((item)=>String(item[column]).includes("1")))
+  console.log(newData)
+}
+
+
+
+filterText(1)
   return (
     <div className={styles.container}>
       <button onClick={()=>setTable(!table)}>
         {table?"Карта":"Таблица"}
       </button>
-          {table?<Table events={data.events} time={time}/>:<MapY events={data.events} tome={time}/>}
-          {/*<Tabl/>*/}
+
+          {table?<Table events={data} time={time} filterText={filterText}/>:<MapY events={data} tome={time}/>}
+
     </div>
   )
 }
