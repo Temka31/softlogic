@@ -46,10 +46,11 @@ export default function Row({event,time}) {
 
     const renderImg = (image, items) => {
         return (
-            <Stage width={200} height={200}>
+            <Stage width={640} height={360}>
                 <Layer>
                     <URLImage img={image}/>
                     {items.map(item => {
+                        console.log(item)
                         return <Rect
                             key={item.x}
                             x={item.x}

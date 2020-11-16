@@ -1,5 +1,6 @@
 import Row from "./Row";
-import {useState} from "react";
+import React, {useState} from "react";
+
 const styles = {
     pagesNumber: {
         listStyle: "none",
@@ -9,35 +10,25 @@ const styles = {
         cursor: "pointer",
     }
 };
-export default function Table({ events,time, filterText}) {
+export default function Table({ events,time, submit, renderHeader}) {
 
     const [id, setId]=useState("")
 
     const changeIdFilter =(e)=>{
-        console.log(e.target)
+        console.log(e.target.value)
         setId(e.target.value)
     }
 
-    const handleIdSubmit=(e)=>{
-        console.log(e.target[0].id)
-        filterText(id, e.target[0].id)
-        e.preventDefault();
-    }
 
     return (
         <div>
-            <form id={"id"} onSubmit={handleIdSubmit}>
-                <label>
-                    Имя:
-                    <input type="text" id={"id"} value={id} onChange={changeIdFilter} />
-                </label>
-                <input type="submit" value="Фильтровать" />
-            </form>
+
+            <button onClick={submit}>Фильтровать</button>
             <table>
-                {/*{renderHeader()}*/}
+                {renderHeader()}
 
                 <tbody>
-                {/*{console.log({events})}*/}
+
 
                 {events.map(event => (
                     <Row key={event.id} event={event} time={time}/>
