@@ -1,9 +1,12 @@
 import {useEffect, useRef, useState} from "react";
 import React from "react"
-import {Stage, Layer, Rect, Circle, Image} from 'react-konva';
-import useImage from 'use-image';
+import ImageItem from "./ImageItem";
+import SimpleModal from "./modal";
 
-export default function Row({event,time}) {
+
+export default function Row({event, time, setModal, setOpen}) {
+
+
     const styles = {
         root: {
             border: "1px solid grey",
@@ -35,52 +38,21 @@ export default function Row({event,time}) {
 
 // decode(event.latitude,event.longitude)
 
-
-
-    const URLImage = ({img}) => {
-        // console.log(img)
-        const [image] = useImage(img);
-        return <Image image={image}/>;
-    };
-
-
-    const renderImg = (image, items) => {
-        return (
-            <Stage width={640} height={360}>
-                <Layer>
-                    <URLImage img={image}/>
-                    {items.map(item => {
-                        console.log(item)
-                        return <Rect
-                            key={item.x}
-                            x={item.x}
-                            y={item.y}
-                            width={item.w}
-                            height={item.h}
-                            stroke="black"
-                            onclick={() => alert(2)}
-                        />
-                    })}
-                </Layer>
-            </Stage>
-        )
-
-    }
-
     return (
+        <>
         <tr id={event.id}
-            // onClick={handleClick}
         >
-            {/*{console.log(event)}*/}
+
             <td style={styles.root}>{event.id}</td>
             <td style={styles.root}>{event.camera_id}</td>
             <td style={styles.root}>{time(event.timestamp)}</td>
             <td style={styles.root}>{address}</td>
             <td style={styles.root}>
-                {renderImg(event.image, event.items)}
+                <ImageItem image={event.image} items={event.items} setModal={setModal} setOpen={setOpen}/>
             </td>
 
         </tr>
 
+        </>
     );
 }

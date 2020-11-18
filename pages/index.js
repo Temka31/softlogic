@@ -3,8 +3,8 @@ import Table from "../components/table";
 import {useEffect, useMemo, useRef, useState} from "react";
 import React from "react"
 import MapY from "../components/MapY";
-import {loadGetInitialProps} from "next/dist/next-server/lib/utils";
-
+import SimpleModal from "../components/modal";
+import SimplePopper from "../components/poper";
 
 
 function Home() {
@@ -16,44 +16,23 @@ function Home() {
 
 
 
-    const handleCamera=(e)=>{
-        setFilter(s => ({...s, camera_id: e.target.value}));
-        e.preventDefault();
-    }
-    const handleLabel=(e)=>{
-        setFilter(s => ({...s, label: e.target.value}));
-    }
-    const handlMinTime=(e)=>{
-        setFilter(s => ({...s, timestampMin: e.target.value}));
-    }
-    const handlMaxTime=(e)=>{
-        setFilter(s => ({...s, timestampMax: e.target.value}));
-    }
-    const handleAccuracy=(e)=>{
-        setFilter(s => ({...s, accuracy: e.target.value}));
-    }
-
-    const handleSubmit=(e)=>{
+    const handleSubmit = (e) => {
         console.log(filt())
         console.log(123)
         e.preventDefault();
     }
-
+    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState(null);
     const [loading, setLoading] = useState(true)
+    const [pageItem, setPageItem] = useState({start: 0, end: 30})
     const [table, setTable] = useState(true)
-    const [filter, setFilter] = useState({
-        camera_id: "",
-        timestampMin: "10.10.2020",
-        timestampMax: "12.10.2020",
-        label: "",
-        accuracy: 0
-    })
+    const [itemModal, setItemModal]=useState({})
     const headers = [
-        {name:"Номер",nameE:"id"},
-        {name:"Камера",nameE:"camera_id", input:true, ref:camera, value:filter.camera_id, change:handleCamera},
-        {name:"Время", nameE:"timeMin", nameE2:"timemax", input:true, input2:true, value:filter.timestampMin, change:handlMinTime, value2:filter.timestampMax,change2:handlMaxTime },
-        {name:"Адрес",nameE:"Address"},
-        {name:"Миниатюра",nameE:"image", input:true, select:true, value:filter.label, change:handleLabel, svalue:filter.accuracy, schange:handleAccuracy},
+        {name: "Номер", nameE: "id"},
+        {name: "Камера", nameE: "camera_id", input: true, ref: camera},
+        {name: "Время", nameE: "timeMin", nameE2: "timemax", input: true, input2: true, ref: minTime, ref2: maxTime},
+        {name: "Адрес", nameE: "Address"},
+        {name: "Миниатюра", nameE: "image", input: true, select: true, ref: label, sref: accuracy},
 
     ];
     const [data, setData] = useState(
@@ -113,24 +92,22 @@ function Home() {
     const [resItems, setResItems] = useState()
     const url = "http://dev.softlogicrus.com:9090/events.json"
 
-    // useEffect(() => {
-    //     setLoading(true)
-    //     fetch(
-    //         url,
-    //     )
-    //         .then(response => response.json())
-    //         .then(data => setResItems(data.events));
-    // }, []);
-    //
-    // useMemo(() => {
-    //     if(resItems){
-    //         setData(resItems.slice(1,50));
-    //         setLoading(false);
-    //     }
-    //
-    // }, [resItems]);
+    useEffect(() => {
+        setLoading(true)
+        fetch(
+            url,
+        )
+            .then(response => response.json())
+            .then(data => setResItems(data.events));
+    }, []);
 
+    useMemo(() => {
+        if (resItems) {
+            setData(resItems.slice(pageItem.start, pageItem.end));
+            setLoading(false);
+        }
 
+    }, [resItems, pageItem]);
 
 
     const renderHeader = () => {
@@ -142,22 +119,22 @@ function Home() {
                     return (
                         <th key={header.nameE}>
                             {header.name}
-                            {header.input?
+                            {header.input ?
                                 <label>
                                     <input type="text" id={header.nameE} ref={header.ref}/>
-                                </label>:null
+                                </label> : null
                             }
-                            {header.input2?
+                            {header.input2 ?
                                 <label>
-                                    <input type="text" id={header.nameE} value={header.value2} onChange={header.change2}/>
-                                </label>:null
+                                    <input type="text" id={header.nameE} ref={header.ref2}/>
+                                </label> : null
                             }
-                            {header.select?
-                                <select value={header.svalue} onChange={header.schange}>
+                            {header.select ?
+                                <select ref={header.sref}>
                                     <option value={null}>Все</option>
                                     <option value={true}>true</option>
                                     <option value={false}>false</option>
-                                </select>:null
+                                </select> : null
                             }
                         </th>
                     );
@@ -216,27 +193,37 @@ function Home() {
     const filt = () => {
         let minTimeStamp
         let maxTimeStamp
-        console.log("Nen")
-        if (!!filter.timestampMin) {
-            const minTime = filter.timestampMin.split(".")
+
+        //Дикий костыль
+        let acc
+        if (accuracy.current.value === "Все") {
+            acc = null
+        } else if (accuracy.current.value === "true") {
+            acc = true
+        } else {
+            acc = false
+        }
+
+        if (!!minTime.current.value) {
+            const minTime = minTime.current.value.split(".")
             minTimeStamp = new Date(minTime[2], minTime[1], minTime[0]).getTime() / 1000
 
         }
-        if (!!filter.timestampMax) {
-            const maxTime = filter.timestampMax.split(".")
+        if (!!maxTime.current.value) {
+            const maxTime = maxTime.current.value.split(".")
             maxTimeStamp = new Date(maxTime[2], maxTime[1], maxTime[0]).getTime() / 1000
         }
 
         return data.filter((item) => {
-            if (!!filter.label) {
-                item.items = filterType(item.items, filter.label)
-            }
-            if (typeof filter.accuracy == "boolean") {
-                item.items = filterSuc(item.items, filter.accuracy)
+            if (!!label.current.value) {
+                item.items = filterType(item.items, label.current.value)
             }
 
-            console.log(filterTime(item,minTimeStamp,maxTimeStamp))
-            return filterText(item)&&filterTime(item,minTimeStamp,maxTimeStamp)&&Array.isArray(item.items)
+            if (typeof acc == "boolean") {
+                item.items = filterSuc(item.items, acc)
+            }
+
+            return filterText(item) && filterTime(item, minTimeStamp, maxTimeStamp) && item.items.length > 0
         })
     }
 
@@ -251,33 +238,68 @@ function Home() {
 
 
     const filterTime = (item, min, max) => {
-        console.log(min,max,item.timestamp)
+        if (!min && !max) {
+            return true
+        }
         if (!!min && !!max && min < item.timestamp < max) {
             return true
         }
         if (!min && !!max && item.timestamp < max) {
             return true
         }
-        if (!!min && !max && min<item.timestamp) {
+        if (!!min && !max && min < item.timestamp) {
             return true
         }
+
+    }
+
+    const handleNext = () => {
+        setPageItem({start: pageItem.end, end: pageItem.end + 30});
+    }
+    const handleBack = () => {
+        setPageItem({start: pageItem.start - 30, end: pageItem.start});
     }
 
 
+const renderButton=()=>{
+        return(
+            <div>
+    {pageItem.start >= 30 ? <button onClick={handleBack}>Предыдущие</button> : null}
 
+    <button onClick={handleNext}>Следующие</button>
+            </div>
+)
+}
 
+    const renderTable = () => {
+        return (<div>
+                <Table events={data} time={time} submit={handleSubmit} filterText={filterText}
+                       renderHeader={renderHeader} setModal={setItemModal} setOpen={setOpen}/>
+                {renderButton()}
+
+            </div>
+        )
+    }
+
+    const renderMap=()=>{
+        return(<div>
+            <MapY events={data} time={time} setAnchorEl={setAnchorEl} anchorEl={anchorEl} />
+        {renderButton()}
+        </div>
+        )
+
+    }
     return (
 
         <div className={styles.container}>
-            {/*<input type="text" ref={refContainer} />*/}
-            {/*<button onClick={() => console.log(refContainer)}>444444</button>*/}
             <button onClick={() => setTable(!table)}>
                 {table ? "Карта" : "Таблица"}
             </button>
-            {loading?
-                table?
-                    <Table events={data} time={time} submit={handleSubmit} filterText={filterText} renderHeader={renderHeader}/> : <MapY events={data} time={time}/>:null}
-
+            {!loading ?
+                table ?
+                    renderTable() : renderMap() : null}
+            <SimpleModal item={itemModal} open={open} setOpen={setOpen}/>
+            <SimplePopper anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>
         </div>
 
     )
