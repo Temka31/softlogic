@@ -283,7 +283,7 @@ const renderButton=()=>{
 
     const renderMap=()=>{
         return(<div>
-            <MapY events={data} time={time} setAnchorEl={setAnchorEl} anchorEl={anchorEl} />
+            <MapY events={data} time={time} setModal={setItemModal} setOpen={setOpen} />
         {renderButton()}
         </div>
         )
@@ -298,8 +298,8 @@ const renderButton=()=>{
             {!loading ?
                 table ?
                     renderTable() : renderMap() : null}
-            <SimpleModal item={itemModal} open={open} setOpen={setOpen}/>
-            <SimplePopper anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>
+            <SimpleModal item={itemModal} open={open} setOpen={setOpen} time={time}/>
+            {/*<SimplePopper anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>*/}
         </div>
 
     )
