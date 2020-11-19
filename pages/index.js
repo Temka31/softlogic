@@ -1,94 +1,68 @@
-import styles from '../styles/Home.module.css'
 import Table from "../components/table";
 import {useEffect, useMemo, useRef, useState} from "react";
 import React from "react"
 import MapY from "../components/MapY";
 import SimpleModal from "../components/modal";
-import SimplePopper from "../components/poper";
+import Button from '@material-ui/core/Button';
 
 
 function Home() {
+    const styles = {
+        root: {
+            margin: 0,
+            width: "100%"
+        },
+        header: {
+            border: "1px solid grey",
+            width: "20%"
+        },
+        button: {
+            position: "relative",
+            left: "50%",
+            transform: "translate(-50%, 0)",
+            margin: 10
+        },
+        buttonPrew: {
+            position: "relative",
+            left: "50%",
+            transform: "translate(-100%, 0)",
+            margin: 10
+        }
+    };
     const camera = useRef();
     const label = useRef();
-    const minTime = useRef();
-    const maxTime = useRef();
+    const minTimeI = useRef();
+    const maxTimeI = useRef();
     const accuracy = useRef()
 
 
-
     const handleSubmit = (e) => {
-        console.log(filt())
-        console.log(123)
+        filter()
         e.preventDefault();
     }
     const [open, setOpen] = React.useState(false);
-    const [anchorEl, setAnchorEl] = React.useState(null);
     const [loading, setLoading] = useState(true)
     const [pageItem, setPageItem] = useState({start: 0, end: 30})
     const [table, setTable] = useState(true)
-    const [itemModal, setItemModal]=useState({})
+    const [filterItems, setFilterItems] = useState()
+    const [itemModal, setItemModal] = useState({})
     const headers = [
         {name: "Номер", nameE: "id"},
         {name: "Камера", nameE: "camera_id", input: true, ref: camera},
-        {name: "Время", nameE: "timeMin", nameE2: "timemax", input: true, input2: true, ref: minTime, ref2: maxTime},
+        {
+            name: "Время",
+            nameE: "min dd.mm.yyyy",
+            nameE2: "max dd.mm.yyyy",
+            input: true,
+            input2: true,
+            ref: minTimeI,
+            ref2: maxTimeI
+        },
         {name: "Адрес", nameE: "Address"},
-        {name: "Миниатюра", nameE: "image", input: true, select: true, ref: label, sref: accuracy},
+        {name: "Миниатюра", nameE: "label LP || SIGN", input: true, select: true, ref: label, sref: accuracy},
 
     ];
-    const [data, setData] = useState(
-        [
-            {
-                "id": 1,
-                "timestamp": 1605103000,
-                "camera_id": "2",
-                "image": "https://konvajs.org/assets/lion.png",
-                "latitude": 55.723373333333335,
-                "longitude": 37.626803333333335,
-                "items": [
-                    {
-                        "label": "LP",
-                        "accuracy": 0.85,
-                        "object": "A000AA777",
-                        "x": 0,
-                        "y": 0,
-                        "w": 245,
-                        "h": 80
-                    }, {
-                        "label": "SIGN",
-                        "accuracy": 0.9,
-                        "object": "",
-                        "x": 5,
-                        "y": 5,
-                        "w": 245,
-                        "h": 80
-                    },]
-            }, {
-            "id": 2,
-            "timestamp": 1605103000,
-            "camera_id": "1",
-            "image": "https://konvajs.org/assets/lion.png",
-            "latitude": 55.723373333333335,
-            "longitude": 37.626803333333335,
-            "items": [
-                {
-                    "label": "LP",
-                    "accuracy": 0.5,
-                    "object": "A000AA777",
-                    "x": 5,
-                    "y": 10,
-                    "w": 245,
-                    "h": 80
-                }, {
-                    "label": "LP",
-                    "accuracy": 0.9,
-                    "object": " ",
-                    "x": 4,
-                    "y": 1,
-                    "w": 245,
-                    "h": 80
-                },]
-        }]
-    )
+    const [data, setData] = useState()
     const [resItems, setResItems] = useState()
     const url = "http://dev.softlogicrus.com:9090/events.json"
 
@@ -102,31 +76,45 @@ function Home() {
     }, []);
 
     useMemo(() => {
-        if (resItems) {
+        if (filterItems) {
+            setData(filterItems.slice(pageItem.start, pageItem.end));
+        } else if (resItems) {
             setData(resItems.slice(pageItem.start, pageItem.end));
             setLoading(false);
         }
 
-    }, [resItems, pageItem]);
+    }, [resItems, pageItem, filterItems]);
 
 
     const renderHeader = () => {
         return (
-            <thead>
             <tr>
-                {/*<form id={"id"} onSubmit={handleSubmit}>*/}
                 {headers.map(header => {
                     return (
-                        <th key={header.nameE}>
+                        <th style={styles.header} key={header.nameE}>
                             {header.name}
+                        </th>
+                    );
+                })}
+            </tr>
+        );
+    };
+
+    const renderFilter = () => {
+        return (
+            <tr>
+                {headers.map((header) => {
+                    return (
+                        <th style={styles.header} key={header.nameE}>
                             {header.input ?
                                 <label>
-                                    <input type="text" id={header.nameE} ref={header.ref}/>
+                                    <input type="text" placeholder={header.nameE} id={header.nameE} ref={header.ref}/>
                                 </label> : null
                             }
                             {header.input2 ?
                                 <label>
-                                    <input type="text" id={header.nameE} ref={header.ref2}/>
+                                    <input type="text" id={header.nameE2} placeholder={header.nameE2}
+                                           ref={header.ref2}/>
                                 </label> : null
                             }
                             {header.select ?
@@ -136,16 +124,12 @@ function Home() {
                                     <option value={false}>false</option>
                                 </select> : null
                             }
-                        </th>
-                    );
+                        </th>)
                 })}
 
-                {/*</form>*/}
             </tr>
-            </thead>
-
-        );
-    };
+        )
+    }
     const time = (unix) => {
         let date = new Date(unix * 1000);
         let d = date.getDate()
@@ -190,7 +174,7 @@ function Home() {
     //     })
     // }
 
-    const filt = () => {
+    const filter = () => {
         let minTimeStamp
         let maxTimeStamp
 
@@ -203,18 +187,18 @@ function Home() {
         } else {
             acc = false
         }
-
-        if (!!minTime.current.value) {
-            const minTime = minTime.current.value.split(".")
+        if (!!minTimeI.current.value) {
+            const minTime = minTimeI.current.value.split(".")
             minTimeStamp = new Date(minTime[2], minTime[1], minTime[0]).getTime() / 1000
 
         }
-        if (!!maxTime.current.value) {
-            const maxTime = maxTime.current.value.split(".")
+        if (!!maxTimeI.current.value) {
+            const maxTime = maxTimeI.current.value.split(".")
             maxTimeStamp = new Date(maxTime[2], maxTime[1], maxTime[0]).getTime() / 1000
         }
 
-        return data.filter((item) => {
+        const newItems = JSON.parse(JSON.stringify(resItems));
+        let dataFilter = newItems.filter((item) => {
             if (!!label.current.value) {
                 item.items = filterType(item.items, label.current.value)
             }
@@ -225,6 +209,7 @@ function Home() {
 
             return filterText(item) && filterTime(item, minTimeStamp, maxTimeStamp) && item.items.length > 0
         })
+        setFilterItems(dataFilter)
     }
 
 
@@ -241,7 +226,7 @@ function Home() {
         if (!min && !max) {
             return true
         }
-        if (!!min && !!max && min < item.timestamp < max) {
+        if (!!min && !!max && min < item.timestamp && item.timestamp < max) {
             return true
         }
         if (!min && !!max && item.timestamp < max) {
@@ -261,45 +246,59 @@ function Home() {
     }
 
 
-const renderButton=()=>{
-        return(
+    const renderButton = () => {
+        return (
             <div>
-    {pageItem.start >= 30 ? <button onClick={handleBack}>Предыдущие</button> : null}
+                {pageItem.start >= 30 ?
+                    <Button style={styles.buttonPrew} variant="contained" onClick={handleBack}>Предыдущие</Button> :
+                    <Button style={styles.buttonPrew} variant="contained" disabled
+                            onClick={handleBack}>Предыдущие</Button>}
 
-    <button onClick={handleNext}>Следующие</button>
+                <Button style={styles.buttonPrew} variant="contained" onClick={handleNext}>Следующие</Button>
             </div>
-)
-}
+        )
+    }
 
     const renderTable = () => {
         return (<div>
-                <Table events={data} time={time} submit={handleSubmit} filterText={filterText}
-                       renderHeader={renderHeader} setModal={setItemModal} setOpen={setOpen}/>
+                <Button style={styles.button} variant="contained" onClick={() => setTable(!table)}>
+                    {table ? "Карта" : "Таблица"}
+                </Button>
+                <br></br>
+                <Button variant="contained" color="primary" style={styles.button}
+                        onClick={handleSubmit}>Фильтровать</Button>
+                <Table events={data} time={time}
+                       renderHeader={renderHeader} renderFilter={renderFilter} setModal={setItemModal}
+                       setOpen={setOpen}/>
                 {renderButton()}
 
             </div>
         )
     }
 
-    const renderMap=()=>{
-        return(<div>
-            <MapY events={data} time={time} setModal={setItemModal} setOpen={setOpen} />
-        {renderButton()}
-        </div>
+    const renderMap = () => {
+        return (<div>
+                <Button style={styles.button} variant="contained" onClick={() => setTable(!table)}>
+                    {table ? "Карта" : "Таблица"}
+                </Button>
+                <MapY events={data} time={time} setModal={setItemModal} setOpen={setOpen}/>
+
+                {/*ТУТ передаются все 10к событий, честно страшно такое грузить) */}
+                {/*Можете верхнюю закоментить и эту раскоментить, но мне на моем железе не удалось прогрузить столько точек*/}
+
+                {/*<MapY events={resItems} time={time} setModal={setItemModal} setOpen={setOpen}/>*/}
+                {renderButton()}
+            </div>
         )
 
     }
     return (
 
         <div className={styles.container}>
-            <button onClick={() => setTable(!table)}>
-                {table ? "Карта" : "Таблица"}
-            </button>
             {!loading ?
                 table ?
-                    renderTable() : renderMap() : null}
+                    renderTable() : renderMap() : "Загрузка..."}
             <SimpleModal item={itemModal} open={open} setOpen={setOpen} time={time}/>
-            {/*<SimplePopper anchorEl={anchorEl} setAnchorEl={setAnchorEl}/>*/}
         </div>
 
     )

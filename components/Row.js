@@ -1,7 +1,6 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import React from "react"
 import ImageItem from "./ImageItem";
-import SimpleModal from "./modal";
 
 
 export default function Row({event, time, setModal, setOpen}) {
@@ -19,6 +18,7 @@ export default function Row({event, time, setModal, setOpen}) {
         let url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
         let token = "04a5cd9fd5bd68bf59266d3d20eebda8b1fc7026";
         let query = {lat: lat, lon: lon};
+        console.log(query)
         let options = {
             method: "POST",
             mode: "cors",
@@ -29,29 +29,30 @@ export default function Row({event, time, setModal, setOpen}) {
             },
             body: JSON.stringify(query)
         }
-        console.log(event)
         fetch(url, options)
             .then(response => response.json())
             .then(result => setAddress(result.suggestions[0].value))
             .catch(error => console.log("error", error));
     }
 
-// decode(event.latitude,event.longitude)
+    useEffect(() => {
+        decode(event.latitude, event.longitude)
+    }, []);
 
     return (
         <>
-        <tr id={event.id}
-        >
+            <tr id={event.id}
+            >
 
-            <td style={styles.root}>{event.id}</td>
-            <td style={styles.root}>{event.camera_id}</td>
-            <td style={styles.root}>{time(event.timestamp)}</td>
-            <td style={styles.root}>{address}</td>
-            <td style={styles.root}>
-                <ImageItem image={event.image} items={event.items} setModal={setModal} setOpen={setOpen}/>
-            </td>
+                <td style={styles.root}>{event.id}</td>
+                <td style={styles.root}>{event.camera_id}</td>
+                <td style={styles.root}>{time(event.timestamp)}</td>
+                <td style={styles.root}>{address}</td>
+                <td style={styles.root}>
+                    <ImageItem image={event.image} items={event.items} setModal={setModal} setOpen={setOpen}/>
+                </td>
 
-        </tr>
+            </tr>
 
         </>
     );

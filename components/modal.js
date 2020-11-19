@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import ImageItem from "./ImageItem";
 
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SimpleModal({item,open,setOpen,time}) {
+export default function SimpleModal({item, open, setOpen, time}) {
     const classes = useStyles();
     // getModalStyle is not a pure function, we roll the style only on the first render
     const [modalStyle] = React.useState(getModalStyle);
@@ -44,14 +44,13 @@ export default function SimpleModal({item,open,setOpen,time}) {
     };
 
 
-
     const body = (
         <div style={modalStyle} className={classes.paper}>
             {console.log(item)}
-            {item.time?"Время: "+time(item.time):null}
+            {item.time ? "Время: " + time(item.time) : null}
             <br></br>
-            {item.camera?"ID камеры: "+item.camera:null}
-            {!!item.item&&!!item.item.accuracy?Math.round(item.item.accuracy*100)+"% распознования":null}
+            {item.camera ? "ID камеры: " + item.camera : null}
+            {!!item.item && !!item.item.accuracy ? Math.round(item.item.accuracy * 100) + "% распознования" : null}
             <ImageItem image={item.image} items={item.item} setModal={false}/>
         </div>
     );
