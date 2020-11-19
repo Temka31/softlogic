@@ -17,7 +17,7 @@ export default function Row({event, time, setModal, setOpen}) {
     const decode = (lat, lon) => {
         let url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
         let token = "04a5cd9fd5bd68bf59266d3d20eebda8b1fc7026";
-        let query = {lat: lat, lon: lon};
+        let query = {lat: lat, lon: lon, radius_meters:1000};
         console.log(query)
         let options = {
             method: "POST",
